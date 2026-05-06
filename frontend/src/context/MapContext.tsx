@@ -1,4 +1,4 @@
-import { createContext, useContext, useRef, useState } from "react";
+import { createContext, useContext, useRef, useState, useEffect } from "react";
 import maplibregl from "maplibre-gl";
 
 type UserLocation = {
@@ -54,6 +54,12 @@ export function MapProvider({ children }: { children: React.ReactNode }) {
     );
   }
 
+  useEffect(() => {
+    if (!map) return;
+
+    locateUser()
+  }, [map])
+  
   return (
     <MapContext.Provider value={{ map, userLocation, setMap, locateUser }}>
       {children}

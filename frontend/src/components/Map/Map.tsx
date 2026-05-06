@@ -45,11 +45,6 @@ export default function Map() {
     };
   }, []);
 
-  useEffect(() => {
-    if (!map) return;
-    locateUser()
-    console.log(userLocation)
-  }, [map])
 
   return (
     <div className="map-shell">
