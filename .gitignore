@@ -4,6 +4,7 @@ dist
 .env
 .env.*
 .venv
+.vite
 cache
 planetiler
 *.mbtiles
