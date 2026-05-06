@@ -1,11 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
+import { useMapContext } from "../../context/MapContext";
 
 export default function Map() {
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const mapInstance = useRef<maplibregl.Map | null>(null);
   const [loadError, setLoadError] = useState("");
+  const { setMap } = useMapContext();
+
 
   useEffect(() => {
     if (!mapContainer.current) return;
@@ -32,10 +35,13 @@ export default function Map() {
     map.addControl(new maplibregl.NavigationControl());
 
     mapInstance.current = map;
+    setMap(map);
+
 
     return () => {
       map.remove();
       mapInstance.current = null;
+      setMap(null);
     };
   }, []);
 
