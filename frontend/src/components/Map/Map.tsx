@@ -7,7 +7,7 @@ export default function Map() {
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const mapInstance = useRef<maplibregl.Map | null>(null);
   const [loadError, setLoadError] = useState("");
-  const { setMap } = useMapContext();
+  const { setMap, locateUser, map, userLocation } = useMapContext();
 
 
   useEffect(() => {
@@ -35,8 +35,8 @@ export default function Map() {
     map.addControl(new maplibregl.NavigationControl());
 
     mapInstance.current = map;
+    console.log(map)
     setMap(map);
-
 
     return () => {
       map.remove();
@@ -44,6 +44,12 @@ export default function Map() {
       setMap(null);
     };
   }, []);
+
+  useEffect(() => {
+    if (!map) return;
+    locateUser()
+    console.log(userLocation)
+  }, [map])
 
   return (
     <div className="map-shell">
