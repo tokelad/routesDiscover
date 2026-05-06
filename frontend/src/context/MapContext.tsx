@@ -21,45 +21,38 @@ export function MapProvider({ children }: { children: React.ReactNode }) {
   const userMarker = useRef<maplibregl.Marker | null>(null);
 
   function locateUser() {
-  if (!map) return;
+    console.log(map)
+    if (!map) return;
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lng = position.coords.longitude ?? -0.87734;
+        const lat = position.coords.latitude ?? 41.65606;
 
-  const showUserLocation = (lng: number, lat: number) => {
-    setUserLocation({ lng, lat });
+        setUserLocation({ lng, lat });
 
-    map.flyTo({
-      center: [lng, lat],
-      zoom: 16,
-    });
+        map.flyTo({
+          center: [lng, lat],
+          zoom: 16,
+        });
 
-    if (!userMarker.current) {
-      userMarker.current = new maplibregl.Marker({ color: "#2563eb" })
-        .setLngLat([lng, lat])
-        .setPopup(new maplibregl.Popup().setText("Ты здесь"))
-        .addTo(map);
-    } else {
-      userMarker.current.setLngLat([lng, lat]);
-    }
-  };
-
-  navigator.geolocation.getCurrentPosition(
-    (position) => {
-      showUserLocation(
-        position.coords.longitude,
-        position.coords.latitude
-      );
-    },
-    (error) => {
-      console.error("Geolocation error:", error.message);
-
-      // fallback Zaragoza
-      showUserLocation(-0.87734, 41.65606);
-    },
-    {
-      enableHighAccuracy: true,
-      timeout: 10000,
-    }
-  );
-}
+        if (!userMarker.current) {
+          userMarker.current = new maplibregl.Marker({ color: "#2563eb" })
+            .setLngLat([lng, lat])
+            .setPopup(new maplibregl.Popup().setText("Ты здесь"))
+            .addTo(map);
+        } else {
+          userMarker.current.setLngLat([lng, lat]);
+        }
+      },
+      (error) => {
+        console.error("Geolocation error:", error.message);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+      }
+    );
+  }
 
   useEffect(() => {
     if (!map) return;
