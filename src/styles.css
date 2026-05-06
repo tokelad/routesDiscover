@@ -1,0 +1,48 @@
+:root {
+  color-scheme: light;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  display: grid;
+}
+
+body {
+  background: #dfe7ef;
+}
+
+.map-shell {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.map {
+  width: 100%;
+  height: 100%;
+}
+
+.map-error {
+  position: absolute;
+  z-index: 1;
+  top: 16px;
+  left: 16px;
+  max-width: min(520px, calc(100% - 32px));
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(123, 24, 24, 0.92);
+  color: #fff;
+  font-size: 14px;
+  line-height: 1.4;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.2);
+}
