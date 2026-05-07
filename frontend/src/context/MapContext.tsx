@@ -21,7 +21,6 @@ export function MapProvider({ children }: { children: React.ReactNode }) {
   const userMarker = useRef<maplibregl.Marker | null>(null);
 
   function locateUser() {
-    console.log(map)
     if (!map) return;
     navigator.geolocation.getCurrentPosition(
       (position) => {

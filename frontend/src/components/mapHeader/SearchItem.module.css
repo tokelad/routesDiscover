@@ -1,0 +1,12 @@
+.root {
+    gap: 10px;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+  margin-top: 10px;
+  padding: 8px;
+  padding-left: 20px;
+  padding-right: 20px;
+  box-shadow: 0 0 0 0.5px #ccc;
+  border-radius: 10px;
+}

@@ -7,6 +7,7 @@ import { MapProvider } from "./context/MapContext";
 export default function App() {
   return (
     <Box sx={{ position: "relative", width: "100%", height: "100%" }}>
+      
       <MapProvider>
           <Map />
           <MapHeader />
