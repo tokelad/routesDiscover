@@ -22,7 +22,6 @@ app.add_middleware(
 
 app.include_router(api_router, prefix=settings.api_prefix)
 
-
 @app.get("/", tags=["root"])
 def read_root() -> dict[str, str]:
     return {"message": f"{settings.app_name} is running"}

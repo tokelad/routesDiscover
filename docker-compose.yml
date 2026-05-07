@@ -35,16 +35,12 @@ services:
     restart: unless-stopped
     ports:
       - "127.0.0.1:${BACKEND_PORT:-8000}:8000"
+    env_file:
+      - ./backend/.env
     environment:
       PYTHONDONTWRITEBYTECODE: "1"
       PYTHONUNBUFFERED: "1"
       WATCHFILES_FORCE_POLLING: "true"
-      APP_NAME: ${APP_NAME:-Routes Discover API}
-      API_PREFIX: ${API_PREFIX:-/api}
-      CORS_ORIGINS: ${CORS_ORIGINS:-["http://localhost:5173"]}
-      DATABASE_URL: postgresql://${POSTGRES_USER:-routes_user}:${POSTGRES_PASSWORD:-routes_password}@db:5432/${POSTGRES_DB:-routes_discover}
-      PHOTON_BASE_URL: http://photon:2322
-      TILESERVER_BASE_URL: http://tileserver-gl:8080
     volumes:
       - ./backend:/app
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
@@ -107,7 +103,9 @@ services:
     networks:
       - app_network
 
-  tileserver-gl:    container_name: routesdiscover-tileserver
+  tileserver-gl:
+    image: maptiler/tileserver-gl:latest
+    container_name: routesdiscover-tileserver
     restart: unless-stopped
     ports:
       - "127.0.0.1:${TILESERVER_PORT:-8080}:8080"
@@ -116,7 +114,7 @@ services:
     volumes:
       - ./infra/tileserver:/data
       - ./planetiler:/source_mbtiles:ro
-    command: ["--file", "/source_mbtiles/${TILESERVER_MBTILES_NAME:-zaragoza.mbtiles}"]
+    command: --file /source_mbtiles/${TILESERVER_MBTILES_NAME:-zaragoza.mbtiles}
     networks:
       - app_network
 
