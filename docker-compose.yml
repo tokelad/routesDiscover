@@ -1,0 +1,132 @@
+name: routesdiscover-osm
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: development
+    container_name: routesdiscover-frontend
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${FRONTEND_PORT:-5173}:5173"
+    environment:
+      NODE_ENV: development
+      CHOKIDAR_USEPOLLING: "true"
+      VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8000/api}
+      VITE_TILESERVER_URL: ${VITE_TILESERVER_URL:-http://localhost:8080}
+      VITE_PHOTON_URL: ${VITE_PHOTON_URL:-http://localhost:2322}
+    volumes:
+      - ./frontend:/app
+      - frontend_node_modules:/app/node_modules
+    command: npm run dev -- --host 0.0.0.0 --port 5173
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - app_network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: development
+    container_name: routesdiscover-backend
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${BACKEND_PORT:-8000}:8000"
+    environment:
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTHONUNBUFFERED: "1"
+      WATCHFILES_FORCE_POLLING: "true"
+      APP_NAME: ${APP_NAME:-Routes Discover API}
+      API_PREFIX: ${API_PREFIX:-/api}
+      CORS_ORIGINS: ${CORS_ORIGINS:-["http://localhost:5173"]}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-routes_user}:${POSTGRES_PASSWORD:-routes_password}@db:5432/${POSTGRES_DB:-routes_discover}
+      PHOTON_BASE_URL: http://photon:2322
+      TILESERVER_BASE_URL: http://tileserver-gl:8080
+    volumes:
+      - ./backend:/app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    depends_on:
+      db:
+        condition: service_healthy
+      photon:
+        condition: service_started
+      tileserver-gl:
+        condition: service_started
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "python -c \"from urllib.request import urlopen; import sys; sys.exit(0 if urlopen('http://127.0.0.1:8000/api/health/').getcode() == 200 else 1)\"",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    networks:
+      - app_network
+
+  db:
+    image: postgis/postgis:17-3.5
+    platform: ${POSTGIS_PLATFORM:-linux/amd64}
+    container_name: routesdiscover-postgres
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-routes_discover}
+      POSTGRES_USER: ${POSTGRES_USER:-routes_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-routes_password}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infra/postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+    networks:
+      - app_network
+
+  photon:
+    image: rtuszik/photon-docker:latest
+    container_name: routesdiscover-photon
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${PHOTON_PORT:-2322}:2322"
+    environment:
+      UPDATE_STRATEGY: ${PHOTON_UPDATE_STRATEGY:-SEQUENTIAL}
+      UPDATE_INTERVAL: ${PHOTON_UPDATE_INTERVAL:-7d}
+      REGION: ${PHOTON_REGION:-spain}
+      INITIAL_DOWNLOAD: ${PHOTON_INITIAL_DOWNLOAD:-TRUE}
+    volumes:
+      - photon_data:/photon/data
+    networks:
+      - app_network
+
+  tileserver-gl:
+    image: maptiler/tileserver-gl:latest
+    container_name: routesdiscover-tileserver
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${TILESERVER_PORT:-8080}:8080"
+    environment:
+      TILESERVER_GL_ALLOWED_HOSTS: ${TILESERVER_GL_ALLOWED_HOSTS:-localhost,127.0.0.1,tileserver-gl}
+    volumes:
+      - ./infra/tileserver:/data
+      - ./planetiler:/source_mbtiles:ro
+    command: ["--file", "/source_mbtiles/${TILESERVER_MBTILES_NAME:-zaragoza.mbtiles}"]
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge
+
+volumes:
+  frontend_node_modules:
+  postgres_data:
+  photon_data:
