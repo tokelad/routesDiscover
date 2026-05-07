@@ -1,0 +1,19 @@
+{
+  "options": {
+    "paths": {
+      "root": "",
+      "fonts": "fonts",
+      "sprites": "sprites",
+      "styles": "styles",
+      "mbtiles": "mbtiles"
+    },
+    "domains": ["localhost:8080", "127.0.0.1:8080"],
+    "allowedHosts": "localhost,127.0.0.1,tileserver-gl"
+  },
+  "data": {
+    "local": {
+      "mbtiles": "your-map.mbtiles"
+    }
+  },
+  "styles": {}
+}
