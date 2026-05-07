@@ -4,8 +4,12 @@ dist
 .env
 .env.*
 .venv
+backend/.venv
 .vite
 cache
 planetiler
 *.mbtiles
 *.pbf
+__pycache__
+*.pyc
+.pytest_cache
