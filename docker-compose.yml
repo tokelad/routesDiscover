@@ -107,9 +107,7 @@ services:
     networks:
       - app_network
 
-  tileserver-gl:
-    image: maptiler/tileserver-gl:latest
-    container_name: routesdiscover-tileserver
+  tileserver-gl:    container_name: routesdiscover-tileserver
     restart: unless-stopped
     ports:
       - "127.0.0.1:${TILESERVER_PORT:-8080}:8080"
