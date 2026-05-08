@@ -1,4 +1,5 @@
 .mapHeader {
+    width: 300px;
     position: absolute;
     top: 16px;
     left: 16px;
@@ -28,10 +29,16 @@
   border-radius: 10px;
 }
 
+
+
 .searchIcon {
   cursor: pointer !important;
 }
 
 .dehazeIcon {
   cursor: pointer !important;
+}
+
+.history {
+  max-width: 300px;
 }

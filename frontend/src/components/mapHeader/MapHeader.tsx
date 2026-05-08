@@ -1,10 +1,12 @@
 import styles from "./MapHeader.module.css"
-import { Box, Button, TextField } from "@mui/material"
-import { useReducer } from "react"
+import { Box, TextField } from "@mui/material"
 import DehazeIcon from '@mui/icons-material/Dehaze';
 import SearchIcon from '@mui/icons-material/Search';
+import useMapHeader from "./useMapHeader";
 
 export default function MapHeader(){
+  const { handlePlaceSearch, renderItems } = useMapHeader()
+  
 
   return (
     <Box className={styles.mapHeader}>
@@ -14,6 +16,7 @@ export default function MapHeader(){
             <TextField
               placeholder="Search in the Maps"
               variant="standard"
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => handlePlaceSearch(e)}
               slotProps={{
                 input: {
                   disableUnderline: true,
@@ -24,7 +27,7 @@ export default function MapHeader(){
         </Box>
 
         <Box className={styles.history}>
-
+              {renderItems()}
         </Box>
       </Box>
     </Box>
