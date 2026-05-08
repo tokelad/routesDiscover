@@ -1,4 +1,5 @@
 .mapHeader {
+    width: 300px;
     position: absolute;
     top: 16px;
     left: 16px;
@@ -36,4 +37,9 @@
 
 .dehazeIcon {
   cursor: pointer !important;
+}
+
+.history {
+  max-width: 300px;
+  
 }
