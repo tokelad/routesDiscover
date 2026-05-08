@@ -3,6 +3,7 @@ import { useState, useEffect, ReactNode } from "react";
 import { getGeocode } from "../api";
 import { Box } from "@mui/material";
 import SearchItem from "./SearchItem";
+import { useMapContext } from "../../context/MapContext";
 
 interface UseMapHeaderReturn {
     handlePlaceSearch: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -18,10 +19,11 @@ type Feature = {
     country: string
     osm_key: string
     street: string
+    
   }
   geometry: {
     type: string
-    coordinates: number[]
+    coordinates: [number, number]
   }
 }
 
@@ -30,6 +32,7 @@ export default function useMapHeader(): UseMapHeaderReturn{
 
     const [placeSearch, setPlaceSearch] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("")
+    const {map} = useMapContext()
 
      const { data } = useQuery({
       queryKey: ["geocode", debouncedSearch],
@@ -52,6 +55,15 @@ export default function useMapHeader(): UseMapHeaderReturn{
      setPlaceSearch(prev => prev = e.target.value)
     }
 
+    const handlePointMode = (coordinates: [number, number]) => {
+        map?.flyTo({
+            center: [...coordinates],
+            zoom: 14,
+        })
+        console.log("clocked")
+    }
+
+
     const renderItems = () => (placeSearch && (
         <Box>
             {data?.features?.map((feature: Feature) => (
@@ -61,6 +73,7 @@ export default function useMapHeader(): UseMapHeaderReturn{
                 name={feature.properties.name}
                 country={feature.properties.country}
                 street={feature.properties.street}
+                onClick={() => handlePointMode(feature.geometry.coordinates)}
             />
             ))}
         </Box>
